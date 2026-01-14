@@ -5,6 +5,20 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+// Middleware to verify token
+const auth = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ message: 'No token' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
 // Signup
 router.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
@@ -37,6 +51,16 @@ router.post('/login', async (req, res) => {
     res.json({ token, user: { id: user._id, name: user.name, email } });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// Delete user
+router.delete('/me', auth, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.status(200).json({ message: 'User deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
