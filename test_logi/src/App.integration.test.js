@@ -1,5 +1,5 @@
 // Mock the auth context
-jest.mock('../contexts/AuthContext', () => ({
+jest.mock('./contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { email: 'test@example.com' },
     login: jest.fn(),
@@ -12,7 +12,10 @@ jest.mock('../contexts/AuthContext', () => ({
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import App from '../App';
+import App from './App';
+
+// Mock fetch
+global.fetch = jest.fn();
 
 // Mock localStorage
 const localStorageMock = {
@@ -24,16 +27,21 @@ const localStorageMock = {
 global.localStorage = localStorageMock;
 
 const renderApp = () => {
-  return render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  );
+  return render(<App />);
 };
 
 describe('EasyBooking Integration Tests', () => {
   beforeEach(() => {
-    localStorageMock.getItem.mockReturnValue(null);
+    global.fetch.mockClear();
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([
+        { _id: '1', name: 'Salle A', capacity: 10 },
+        { _id: '2', name: 'Salle B', capacity: 20 },
+        { _id: '3', name: 'Salle C', capacity: 5 },
+      ]),
+    });
+    localStorageMock.getItem.mockReturnValue('fake-jwt-token');
     localStorageMock.setItem.mockClear();
   });
 

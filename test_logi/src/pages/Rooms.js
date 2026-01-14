@@ -73,7 +73,7 @@ const Rooms = () => {
       <h1 className="text-2xl font-bold mb-4">Liste des Salles</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {rooms.map(room => (
-          <Card key={room.id}>
+          <Card key={room._id}>
             <CardHeader>
               <CardTitle>{room.name}</CardTitle>
               <CardDescription>Capacité: {room.capacity}</CardDescription>
