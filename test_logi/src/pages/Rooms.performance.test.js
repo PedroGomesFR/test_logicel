@@ -3,6 +3,18 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Rooms from './Rooms';
 
+// Mock AuthContext
+jest.mock('../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { email: 'test@example.com' },
+    getToken: () => 'mock-token',
+    login: jest.fn(),
+    logout: jest.fn(),
+    loading: false,
+  }),
+  AuthProvider: ({ children }) => <div>{children}</div>,
+}));
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),
@@ -12,9 +24,21 @@ const localStorageMock = {
 };
 global.localStorage = localStorageMock;
 
+// Mock fetch
+global.fetch = jest.fn();
+
 describe('Performance Tests', () => {
   beforeEach(() => {
     localStorageMock.getItem.mockReturnValue(null);
+    global.fetch.mockClear();
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => [
+        { _id: '1', name: 'Salle A', capacity: 10 },
+        { _id: '2', name: 'Salle B', capacity: 20 },
+        { _id: '3', name: 'Salle C', capacity: 30 },
+      ],
+    });
   });
 
   test('Rooms component renders within performance budget', () => {
