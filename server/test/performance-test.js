@@ -1,5 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import exec from 'k6/execution';
 
 // Liste de 5 utilisateurs fictifs
 const users = [
@@ -10,15 +11,6 @@ const users = [
   { email: 'user5@example.com', password: 'password123' },
 ];
 
-// Liste de salles fictives (assumées seedées)
-const rooms = [
-  { id: '1', name: 'Salle A' },
-  { id: '2', name: 'Salle B' },
-  { id: '3', name: 'Salle C' },
-  { id: '4', name: 'Salle D' },
-  { id: '5', name: 'Salle E' },
-];
-
 export let options = {
   vus: 5, // Maximum 5 utilisateurs virtuels
   duration: '1m', // Test pendant 1 minute
@@ -27,8 +19,16 @@ export let options = {
   },
 };
 
-// Fonction setup : crée les utilisateurs via l'API signup
+// Setup function: creates users via signup API and fetches rooms
 export function setup() {
+  // 1. Fetch available rooms
+  const roomsResponse = http.get('http://localhost:5001/api/rooms');
+  if (roomsResponse.status !== 200) {
+    throw new Error('Failed to fetch rooms');
+  }
+  const rooms = roomsResponse.json();
+
+  // 2. Create users and get tokens
   const tokens = [];
   for (const user of users) {
     const signupPayload = JSON.stringify({
@@ -36,37 +36,67 @@ export function setup() {
       email: user.email,
       password: user.password,
     });
-    const signupResponse = http.post('http://localhost:5001/api/auth/signup', signupPayload, {
-      headers: { 'Content-Type': 'application/json' },
-    });
-    check(signupResponse, {
-      'signup status is 201': (r) => r.status === 201,
-    });
-    // Stocke le token pour teardown
-    const loginPayload = JSON.stringify({
+
+    // Attempt login first (in case user already exists)
+    let loginPayload = JSON.stringify({
       email: user.email,
       password: user.password,
     });
-    const loginResponse = http.post('http://localhost:5001/api/auth/login', loginPayload, {
+
+    let loginResponse = http.post('http://localhost:5001/api/auth/login', loginPayload, {
       headers: { 'Content-Type': 'application/json' },
     });
+
+    // If login fails, try signup
+    if (loginResponse.status !== 200) {
+      const signupResponse = http.post('http://localhost:5001/api/auth/signup', signupPayload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      check(signupResponse, {
+        'signup status is 201': (r) => r.status === 201,
+      });
+
+      // Login again after signup
+      loginResponse = http.post('http://localhost:5001/api/auth/login', loginPayload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     tokens.push(loginResponse.json().token);
   }
-  return { tokens };
+  return { tokens, rooms };
 }
 
 export default function (data) {
   const userIndex = (__VU - 1) % users.length;
-  const user = users[userIndex];
-  const room = rooms[userIndex];
   const token = data.tokens[userIndex];
+
+  const rooms = data.rooms;
+  if (!rooms || rooms.length === 0) {
+    console.error("No rooms available!");
+    return;
+  }
+
+  const roomIndex = userIndex % rooms.length;
+  const room = rooms[roomIndex];
+
+  const times = ['10:00', '11:00', '14:00', '15:00', '16:00'];
+  const timeIndex = Math.floor(userIndex / rooms.length) % times.length;
+  const time = times[timeIndex];
+
+  // Generate unique date based on iteration to avoid 'Already booked'
+  // Start from 2024-01-01 and add iteration days
+  const iter = exec.vu.iterationInScenario;
+  const distinctDate = new Date(2024, 0, 1);
+  distinctDate.setDate(distinctDate.getDate() + iter);
+  const dateStr = distinctDate.toISOString().split('T')[0];
 
   // 1. Login (token déjà obtenu)
   // 2. Réservation avec JWT
   const bookingPayload = JSON.stringify({
-    roomId: room.id,
-    date: '2023-12-01',
-    time: '10:00',
+    roomId: room._id,
+    date: dateStr,
+    time: time,
   });
   const bookingResponse = http.post('http://localhost:5001/api/bookings', bookingPayload, {
     headers: {
