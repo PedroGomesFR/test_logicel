@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -48,7 +48,7 @@ const Signup = () => {
           <h1 className="text-3xl font-light text-stone-800 mb-2">Créer un compte</h1>
           <p className="text-stone-500 font-light">Rejoignez-nous dès aujourd'hui</p>
         </div>
-        
+
         <Card className="border-0 shadow-xl shadow-stone-200/50 bg-white/80 backdrop-blur-sm">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -88,8 +88,8 @@ const Signup = () => {
                   placeholder="••••••••"
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-stone-800 hover:bg-stone-700 text-white font-light py-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 S'inscrire

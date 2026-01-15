@@ -64,7 +64,10 @@ export function setup() {
 
     tokens.push(loginResponse.json().token);
   }
-  return { tokens, rooms };
+
+  // Return current time as base for unique dates across test runs
+  const startTime = Date.now();
+  return { tokens, rooms, startTime };
 }
 
 export default function (data) {
@@ -85,9 +88,9 @@ export default function (data) {
   const time = times[timeIndex];
 
   // Generate unique date based on iteration to avoid 'Already booked'
-  // Start from 2024-01-01 and add iteration days
+  // Start from base time passed from setup() and add iteration days
   const iter = exec.vu.iterationInScenario;
-  const distinctDate = new Date(2024, 0, 1);
+  const distinctDate = new Date(data.startTime);
   distinctDate.setDate(distinctDate.getDate() + iter);
   const dateStr = distinctDate.toISOString().split('T')[0];
 

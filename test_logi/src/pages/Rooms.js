@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([]);
-  const [bookings, setBookings] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -62,10 +61,6 @@ const Rooms = () => {
     setDate('');
     setTime('');
     setDialogOpen(true);
-  };
-
-  const isBooked = (roomId, date, time) => {
-    return bookings.some(b => b.roomId === roomId && b.date === date && b.time === time);
   };
 
   const getRoomIcon = (roomName) => {

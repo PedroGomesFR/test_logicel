@@ -34,7 +34,7 @@ router.post('/', auth, async (req, res) => {
   try {
     // Check if already booked
     const existing = await Booking.findOne({ roomId, date, time });
-    if (existing) return res.status(400).json({ message: 'Already booked' });
+    if (existing) return res.status(400).json({ message: 'deja reservé' });
 
     const booking = new Booking({ userId: req.userId, roomId, date, time });
     await booking.save();

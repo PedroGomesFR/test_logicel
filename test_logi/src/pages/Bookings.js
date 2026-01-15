@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Card, CardContent } from '../components/ui/card';
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -44,7 +43,7 @@ const Bookings = () => {
           <h1 className="text-4xl font-light text-stone-800 mb-3">Mes Réservations</h1>
           <p className="text-stone-500 font-light">Consultez toutes vos réservations en cours</p>
         </div>
-        
+
         {bookings.length === 0 ? (
           <Card className="border-0 shadow-md bg-white/60 backdrop-blur-sm">
             <CardContent className="p-16 text-center">
@@ -63,8 +62,8 @@ const Bookings = () => {
         ) : (
           <div className="space-y-4">
             {bookings.map(booking => (
-              <Card 
-                key={booking._id} 
+              <Card
+                key={booking._id}
                 className="border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white/60 backdrop-blur-sm"
               >
                 <CardContent className="p-8">
