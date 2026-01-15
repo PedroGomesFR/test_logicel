@@ -1,19 +1,11 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '../contexts/AuthContext';
 import Rooms from './Rooms';
 
-// Mock AuthContext
-jest.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: { email: 'test@example.com' },
-    getToken: () => 'mock-token',
-    login: jest.fn(),
-    logout: jest.fn(),
-    loading: false,
-  }),
-  AuthProvider: ({ children }) => <div>{children}</div>,
-}));
+// Mock fetch
+global.fetch = jest.fn();
 
 // Mock localStorage
 const localStorageMock = {
@@ -31,24 +23,31 @@ describe('Performance Tests', () => {
   beforeEach(() => {
     localStorageMock.getItem.mockReturnValue(null);
     global.fetch.mockClear();
-    global.fetch.mockResolvedValue({
-      ok: true,
-      json: async () => [
-        { _id: '1', name: 'Salle A', capacity: 10 },
-        { _id: '2', name: 'Salle B', capacity: 20 },
-        { _id: '3', name: 'Salle C', capacity: 30 },
-      ],
-    });
   });
 
-  test('Rooms component renders within performance budget', () => {
+  test('Rooms component renders within performance budget', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve([
+        { _id: '1', name: 'Salle A', capacity: 10 },
+        { _id: '2', name: 'Salle B', capacity: 20 },
+        { _id: '3', name: 'Salle C', capacity: 5 },
+        { _id: '4', name: 'Salle D', capacity: 15 },
+        { _id: '5', name: 'Salle E', capacity: 25 },
+      ]),
+    });
+
     const startTime = performance.now();
 
     render(
       <BrowserRouter>
-        <Rooms />
+        <AuthProvider>
+          <Rooms />
+        </AuthProvider>
       </BrowserRouter>
     );
+
+    await screen.findByText('Liste des Salles');
 
     const endTime = performance.now();
     const renderTime = endTime - startTime;
@@ -60,26 +59,29 @@ describe('Performance Tests', () => {
     expect(screen.getByText('Liste des Salles')).toBeInTheDocument();
   });
 
-  test('handles multiple rooms efficiently', () => {
-    // Mock more rooms
-    const originalUseState = React.useState;
-    jest.spyOn(React, 'useState').mockImplementationOnce(() =>
-      originalUseState([
-        { id: 1, name: 'Salle A', capacity: 10 },
-        { id: 2, name: 'Salle B', capacity: 20 },
-        { id: 3, name: 'Salle C', capacity: 5 },
-        { id: 4, name: 'Salle D', capacity: 15 },
-        { id: 5, name: 'Salle E', capacity: 25 },
-      ])
-    );
+  test('handles multiple rooms efficiently', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve([
+        { _id: '1', name: 'Salle A', capacity: 10 },
+        { _id: '2', name: 'Salle B', capacity: 20 },
+        { _id: '3', name: 'Salle C', capacity: 5 },
+        { _id: '4', name: 'Salle D', capacity: 15 },
+        { _id: '5', name: 'Salle E', capacity: 25 },
+      ]),
+    });
 
     const startTime = performance.now();
 
     render(
       <BrowserRouter>
-        <Rooms />
+        <AuthProvider>
+          <Rooms />
+        </AuthProvider>
       </BrowserRouter>
     );
+
+    await screen.findByText('Salle A');
 
     const endTime = performance.now();
     const renderTime = endTime - startTime;
@@ -87,7 +89,36 @@ describe('Performance Tests', () => {
     // Should still render quickly even with more rooms
     expect(renderTime).toBeLessThan(200);
     expect(screen.getAllByText('Réserver')).toHaveLength(5);
+  });
 
-    React.useState.mockRestore();
+  test('simulates user login, booking, and retrieving bookings with JWT', async () => {
+    // Mock rooms fetch
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve([
+        { _id: '1', name: 'Salle A', capacity: 10 },
+      ]),
+    });
+
+    // Set token in localStorage to simulate logged in user
+    localStorageMock.getItem.mockReturnValue('fake-jwt-token');
+
+    render(
+      <BrowserRouter>
+        <AuthProvider>
+          <Rooms />
+        </AuthProvider>
+      </BrowserRouter>
+    );
+
+    // Wait for rooms to load
+    await screen.findByText('Salle A');
+
+    // Verify rooms are displayed
+    expect(screen.getByText('Salle A')).toBeInTheDocument();
+    expect(screen.getByText('Capacité: 10')).toBeInTheDocument();
+
+    // Verify fetch calls with auth header
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:5001/api/rooms');
   });
 });

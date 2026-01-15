@@ -59,11 +59,7 @@ const mockBookings = [
 ];
 
 const renderApp = () => {
-  return render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  );
+  return render(<App />);
 };
 
 describe("EasyBooking - Tests d'Intégration Complets", () => {
@@ -418,7 +414,7 @@ describe("EasyBooking - Tests d'Intégration Complets", () => {
     });
 
     test("9. Gestion d'erreur lors de la connexion", async () => {
-      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => { });
 
       // Mock fetch avec erreur
       global.fetch.mockResolvedValueOnce({
@@ -448,7 +444,7 @@ describe("EasyBooking - Tests d'Intégration Complets", () => {
     });
 
     test("10. Gestion d'erreur lors de la réservation", async () => {
-      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => { });
 
       // Mock fetch pour les salles
       global.fetch.mockResolvedValueOnce({

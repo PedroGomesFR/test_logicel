@@ -96,11 +96,11 @@ const Rooms = () => {
           <h1 className="text-4xl font-light text-stone-800 mb-3">Nos Espaces</h1>
           <p className="text-stone-500 font-light">Choisissez l'espace qui correspond à vos besoins</p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {rooms.map(room => (
-            <Card 
-              key={room._id || room.id} 
+            <Card
+              key={room._id || room.id}
               className="border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white/60 backdrop-blur-sm overflow-hidden group"
             >
               <div className="p-8">
@@ -124,7 +124,7 @@ const Rooms = () => {
                     }
                   }}>
                     <DialogTrigger asChild>
-                      <Button 
+                      <Button
                         onClick={() => openDialog(room)}
                         className="w-full bg-stone-800 hover:bg-stone-700 text-white font-light py-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
                       >
@@ -163,8 +163,8 @@ const Rooms = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        <Button 
-                          onClick={handleBook} 
+                        <Button
+                          onClick={handleBook}
                           disabled={!date || !time}
                           className="w-full bg-stone-800 hover:bg-stone-700 text-white font-light py-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >

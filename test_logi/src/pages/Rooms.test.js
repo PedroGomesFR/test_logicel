@@ -37,6 +37,16 @@ const renderWithRouter = (component) => {
 
 describe('Rooms Component', () => {
   beforeEach(() => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([
+          { _id: '1', name: 'Salle A', capacity: 10 },
+          { _id: '2', name: 'Salle B', capacity: 20 },
+          { _id: '3', name: 'Salle C', capacity: 5 },
+        ]),
+      })
+    );
     localStorageMock.getItem.mockReturnValue(null);
     localStorageMock.setItem.mockClear();
     global.fetch.mockClear();
@@ -53,7 +63,7 @@ describe('Rooms Component', () => {
   test('renders rooms list', async () => {
     renderWithRouter(<Rooms />);
     expect(screen.getByText('Liste des Salles')).toBeInTheDocument();
-    
+
     // Attendre que les salles soient chargées
     await screen.findByText('Salle A');
     expect(screen.getByText('Salle A')).toBeInTheDocument();
@@ -70,9 +80,9 @@ describe('Rooms Component', () => {
 
   test('loads rooms from API', async () => {
     renderWithRouter(<Rooms />);
-    
+
     await screen.findByText('Salle A');
-    
+
     // Vérifier que l'API a été appelée
     expect(global.fetch).toHaveBeenCalledWith('http://localhost:5001/api/rooms');
   });
