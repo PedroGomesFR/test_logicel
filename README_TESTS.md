@@ -35,12 +35,7 @@ npm install
 ```
 
 **Configuration (.env) :**
-Créez un fichier `.env` dans le dossier `server/` s'il n'existe pas, et ajoutez-y les clés suivantes (exemple) :
-```env
-PORT=5001
-MONGO_URI=mongodb://localhost:27017/test_db
-JWT_SECRET=mon_super_secret_pour_les_tests
-```
+Créez un fichier `.env` dans le dossier `server/`, je vous ai fourni le contenue par teams(Pedro Gomes).
 
 ### Étape 2.2 : Installation du Frontend (React)
 
