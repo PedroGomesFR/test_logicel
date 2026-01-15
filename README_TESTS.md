@@ -1,275 +1,124 @@
-# 📋 Documentation des Tests
+# � Guide Complet : Installation et Tests
 
-Ce document décrit tous les tests disponibles dans le projet et les commandes pour les exécuter.
-
-## 📁 Structure des Tests
-
-Le projet contient deux ensembles de tests :
-- **Backend (Server)** : Tests pour l'API Node.js/Express
-- **Frontend (test_logi)** : Tests pour l'application React
+Ce guide vous explique étape par étape comment installer le projet sur votre machine locale, le lancer et exécuter tous les tests disponibles.
 
 ---
 
-## 🖥️ Tests Backend (Server)
+## �️ 1. Prérequis
 
-### Localisation
-Les tests sont situés dans `/server/test/`
+Avant de commencer, assurez-vous d'avoir installé les outils suivants sur votre ordinateur :
 
-### Framework utilisé
-- **Jest** : Framework de test
-- **Supertest** : Test des endpoints HTTP
+*   **Node.js** (Version 14 ou supérieure) : [Télécharger ici](https://nodejs.org/)
+*   **MongoDB** (Base de données) : [Télécharger ici](https://www.mongodb.com/try/download/community)
+    *   *Assurez-vous que MongoDB est lancé et tourne sur votre machine.*
+*   **k6** (Pour les tests de performance) :
+    *   **Mac** : `brew install k6`
+    *   **Windows** : `choco install k6`
+    *   **Linux** : `sudo apt-get install k6`
 
-### Tests disponibles
+---
 
-#### 1. Tests des Utilisateurs
-**Fichier** : `test/User.test.js`
-- Inscription (signup)
-- Connexion (login)
-- Validation des données
+## 📥 2. Installation du Projet
 
-#### 2. Tests des Salles
-**Fichier** : `test/Room.test.js`
-- Création de salles
-- Récupération des salles
-- Mise à jour et suppression
+Le projet est divisé en deux parties : le **Server (Backend)** et le **Frontend (React)**. Vous devez installer les dépendances pour les deux.
 
-#### 3. Tests des Réservations
-**Fichier** : `test/Booking.test.js`
-- Création de réservations
-- Récupération des réservations
-- Gestion des conflits
+### Étape 2.1 : Installation du Backend (Server)
 
-#### 4. Tests de Performance
-**Fichier** : `test/performance-test.js`
-- Tests de charge avec k6
-- Simulation de 5 utilisateurs virtuels
-- Durée : 1 minute
-
-### 🚀 Commandes Backend
+Ouvrez votre terminal et exécutez :
 
 ```bash
-# Se placer dans le dossier server
+# Aller dans le dossier serveur
 cd server
 
-# Installer les dépendances
+# Installer les librairies
 npm install
-
-# Lancer tous les tests Jest
-npm test
-
-# Lancer les tests en mode watch
-npm test -- --watch
-
-# Lancer un fichier de test spécifique
-npm test -- User.test.js
-npm test -- Room.test.js
-npm test -- Booking.test.js
-
-# Lancer les tests avec couverture de code
-npm test -- --coverage
-
-# Tests de performance avec k6 (nécessite k6 installé)
-k6 run ./test/performance-test.js
 ```
 
-### 📦 Installation de k6 (pour tests de performance)
-
-```bash
-# macOS
-brew install k6
-
-# Linux
-sudo apt-get install k6
-
-# Windows
-choco install k6
+**Configuration (.env) :**
+Créez un fichier `.env` dans le dossier `server/` s'il n'existe pas, et ajoutez-y les clés suivantes (exemple) :
+```env
+PORT=5001
+MONGO_URI=mongodb://localhost:27017/test_db
+JWT_SECRET=mon_super_secret_pour_les_tests
 ```
 
----
+### Étape 2.2 : Installation du Frontend (React)
 
-## 🎨 Tests Frontend (React)
-
-### Localisation
-Les tests sont situés dans `/test_logi/src/`
-
-### Framework utilisé
-- **Jest** : Framework de test
-- **React Testing Library** : Test des composants React
-- **@testing-library/user-event** : Simulation d'interactions utilisateur
-
-### Tests disponibles
-
-#### 1. Tests de l'Application
-**Fichier** : `src/App.test.js`
-- Rendu de base de l'application
-- Navigation
-
-**Fichier** : `src/App.integration.test.js`
-- Tests d'intégration de l'application complète
-
-#### 2. Tests de Connexion
-**Fichier** : `src/pages/Login.test.js`
-- Formulaire de connexion
-- Validation des champs
-- Soumission
-
-#### 3. Tests d'Inscription
-**Fichier** : `src/pages/Signup.test.js`
-- Formulaire d'inscription
-- Validation des champs
-- Création de compte
-
-#### 4. Tests des Salles
-**Fichier** : `src/pages/Rooms.test.js`
-- Affichage des salles
-- Recherche et filtres
-- Gestion CRUD
-
-**Fichier** : `src/pages/Rooms.performance.test.js`
-- Tests de performance du rendu
-
-#### 5. Tests des Réservations
-**Fichier** : `src/pages/Bookings.test.js`
-- Affichage des réservations
-- Création de réservation
-- Gestion des réservations
-
-**Fichier** : `src/pages/Bookings.integration.test.js`
-- Tests d'intégration des réservations
-
-### 🚀 Commandes Frontend
+Ouvrez un **nouveau** terminal (ou revenez à la racine) et exécutez :
 
 ```bash
-# Se placer dans le dossier test_logi
+# Aller dans le dossier frontend
 cd test_logi
 
-# Installer les dépendances
+# Installer les librairies
 npm install
-
-# Lancer tous les tests
-npm test
-
-# Lancer les tests en mode interactif
-npm test -- --watchAll
-
-# Lancer un fichier de test spécifique
-npm test -- Login.test.js
-npm test -- Signup.test.js
-npm test -- Rooms.test.js
-npm test -- Bookings.test.js
-
-# Lancer les tests avec couverture de code
-npm test -- --coverage --watchAll=false
-
-# Lancer uniquement les tests d'intégration
-npm test -- integration.test.js
-
-# Lancer uniquement les tests de performance
-npm test -- performance.test.js
 ```
 
 ---
 
-## 🔄 Workflow Complet
+## 🚀 3. Lancer le Projet
 
-### Exécuter tous les tests du projet
+Pour utiliser l'application, vous devez lancer le serveur et le site web en même temps (dans deux terminaux différents).
+
+*   **Terminal 1 (Serveur)** :
+    ```bash
+    cd server
+    npm run dev
+    ```
+    *Vous devriez voir : "Server running on port 5001" et "MongoDB Connected"*
+
+*   **Terminal 2 (Frontend)** :
+    ```bash
+    cd test_logi
+    npm start
+    ```
+    *Le site devrait s'ouvrir automatiquement sur `http://localhost:3000`*
+
+---
+
+## 🧪 4. Exécuter les Tests
+
+Voici comment vérifier que tout fonctionne correctement.
+
+### A. Tests Backend (API) ⚙️
+
+Ces tests vérifient que le serveur, la base de données et l'authentification fonctionnent.
 
 ```bash
-# Terminal 1 - Tests Backend
 cd server
-npm install
 npm test
+```
+*Cela lancera Jest et testera l'inscription, la connexion, les chambres et les réservations.*
 
-# Terminal 2 - Tests Frontend
+### B. Tests Frontend (Interface) 🎨
+
+Ces tests vérifient que les pages s'affichent bien et que les boutons fonctionnent.
+
+```bash
 cd test_logi
-npm install
 npm test
 ```
+*Appuyez sur `a` pour lancer tous les tests si on vous le demande.*
 
-### Avant de pousser du code
+### C. Tests de Performance (Charge) 📈
 
+Ces tests simulent plusieurs utilisateurs connectés en même temps pour voir si le serveur tient le coup.
+
+**Commande :**
 ```bash
-# Backend
-cd server && npm test -- --coverage
-
-# Frontend
-cd test_logi && npm test -- --coverage --watchAll=false
-
-# Tests de performance
-cd server && k6 run ./test/performance-test.js
+# Depuis la racine du projet ou le dossier server
+k6 run server/test/performance-test.js
 ```
+
+**Comprendre le résultat :**
+*   Regardez la ligne `http_req_duration`.
+*   Si `p(95) < 1000ms`, le test est **RÉUSSI** (le serveur répond vite).
+*   Si vous voyez des croix rouges ❌, le serveur est trop lent ou a des erreurs.
 
 ---
 
-## 📊 Rapport de Couverture
+## 🆘 Dépannage Rapide
 
-### Backend
-Après `npm test -- --coverage`, le rapport est disponible dans :
-```
-server/coverage/lcov-report/index.html
-```
-
-### Frontend
-Après `npm test -- --coverage --watchAll=false`, le rapport est disponible dans :
-```
-test_logi/coverage/lcov-report/index.html
-```
-
----
-
-## ⚙️ Configuration
-
-### Jest Backend
-Configuration dans `server/jest.config.js`
-
-### Jest Frontend
-Configuration dans `test_logi/package.json` (section jest/eslintConfig)
-
----
-
-## 🐛 Dépannage
-
-### Problème : Tests Jest ne se lancent pas
-```bash
-# Nettoyer le cache Jest
-npm test -- --clearCache
-```
-
-### Problème : Erreurs de dépendances
-```bash
-# Réinstaller les dépendances
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### Problème : k6 non trouvé
-```bash
-# Installer k6 (macOS)
-brew install k6
-
-# Vérifier l'installation
-k6 version
-```
-
----
-
-## 📝 Bonnes Pratiques
-
-1. **Lancer les tests avant chaque commit**
-2. **Maintenir une couverture de code > 80%**
-3. **Écrire des tests pour chaque nouvelle fonctionnalité**
-4. **Tester les cas d'erreur et les edge cases**
-5. **Utiliser des noms de test descriptifs**
-
----
-
-## 🔗 Ressources
-
-- [Jest Documentation](https://jestjs.io/)
-- [React Testing Library](https://testing-library.com/react)
-- [Supertest](https://github.com/visionmedia/supertest)
-- [k6 Documentation](https://k6.io/docs/)
-
----
-
-**Dernière mise à jour** : 14 janvier 2026
+*   **Erreur "Connection refused"** : Vérifiez que MongoDB est bien lancé !
+*   **Erreur "EADDRINUSE"** : Le port 5001 ou 3000 est déjà pris. Coupez les autres terminaux Node.js.
+*   **Tests k6 qui échouent** : Assurez-vous que le serveur (`npm run dev` dans `server/`) est ALLUMÉ pendant que vous lancez k6.
